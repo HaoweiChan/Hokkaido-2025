@@ -1,20 +1,31 @@
 export enum LocationType {
-  HOTEL = 'HOTEL',
-  FOOD = 'FOOD',
-  SIGHTSEEING = 'SIGHTSEEING',
-  TRANSPORT = 'TRANSPORT',
-  SHOPPING = 'SHOPPING',
-  ACTIVITY = 'ACTIVITY'
+  TRANSPORT = '交通',
+  FOOD = '美食',
+  HOTEL = '住宿',
+  SHOPPING = '購物',
+  ACTIVITY = '活動',
+  SIGHTSEEING = '景點'
 }
 
-export interface ItineraryItem {
+export interface ItineraryEvent {
   time: string;
   title: string;
+  type: LocationType;
   description?: string;
   location?: string;
-  type: LocationType;
-  transportInfo?: string; // For bus/train numbers
   notes?: string;
+  transportInfo?: string; // e.g., "JR Rapid Airport (37min)"
+  
+  // New rich fields
+  tips?: string[]; // Pro tips like "Queue early"
+  transportDetail?: string; // Detailed instructions like "Exit 4, walk 5 mins"
+  cost?: string; // Estimated cost
+  bookingRequired?: boolean;
+  websiteUrl?: string;
+  
+  // For Taxi Card
+  japaneseAddress?: string; // Full address in Japanese for driver
+  japaneseName?: string; // Name in Japanese
 }
 
 export interface DaySchedule {
@@ -22,7 +33,8 @@ export interface DaySchedule {
   date: string;
   weekday: string;
   title: string;
-  events: ItineraryItem[];
+  weatherForecast?: string; // e.g., "Snow, -2°C"
+  events: ItineraryEvent[];
 }
 
 export interface SavedPlace {
@@ -30,6 +42,7 @@ export interface SavedPlace {
   name: string;
   jpName?: string;
   type: LocationType;
-  googleMapsUrl?: string; // Specific URL if available, otherwise search query
-  address?: string;
+  address: string;
+  googleMapsUrl?: string;
+  notes?: string;
 }

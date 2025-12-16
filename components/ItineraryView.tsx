@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ITINERARY_DATA } from '../constants';
-import { LocationType } from '../types';
-import { MapPin, Bus, Utensils, BedDouble, Camera, ShoppingBag, Dumbbell } from 'lucide-react';
+import { LocationType, ItineraryEvent } from '../types';
+import { MapPin, Bus, Utensils, BedDouble, Camera, ShoppingBag, Dumbbell, ChevronDown, ChevronUp, Info, Lightbulb, X, CloudSnow } from 'lucide-react';
 
 const getIcon = (type: LocationType) => {
   switch (type) {
@@ -15,12 +15,147 @@ const getIcon = (type: LocationType) => {
   }
 };
 
+const TaxiModal: React.FC<{ address: string; name?: string; onClose: () => void }> = ({ address, name, onClose }) => (
+  <div className="fixed inset-0 z-50 bg-black/90 flex flex-col justify-center items-center p-6 text-center animate-in fade-in duration-200" onClick={onClose}>
+    <button onClick={onClose} className="absolute top-6 right-6 text-white/80 hover:text-white">
+      <X className="w-8 h-8" />
+    </button>
+    <p className="text-slate-400 mb-4 text-sm font-medium uppercase tracking-widest">Show to Driver</p>
+    <div className="bg-white text-slate-900 p-8 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+      {name && <h3 className="text-2xl font-bold mb-4 border-b pb-4">{name}</h3>}
+      <p className="text-3xl font-black leading-relaxed select-all">{address}</p>
+    </div>
+    <p className="mt-8 text-white/60 text-sm">Tap anywhere to close</p>
+  </div>
+);
+
+const EventCard: React.FC<{ event: ItineraryEvent }> = ({ event }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showTaxi, setShowTaxi] = useState(false);
+
+  return (
+    <>
+      <div 
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`bg-white p-4 rounded-xl shadow-sm border border-slate-100 w-full transition-all duration-200 cursor-pointer ${isExpanded ? 'ring-2 ring-blue-100 shadow-md' : 'hover:shadow-md'}`}
+      >
+        <div className="flex justify-between items-start mb-1">
+          <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+            {event.time}
+          </span>
+          <div className="flex items-center text-slate-400">
+             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </div>
+        </div>
+        
+        <h3 className="text-lg font-bold text-slate-800 mb-1">{event.title}</h3>
+        
+        {event.description && (
+          <p className="text-slate-600 text-sm leading-relaxed mb-2">{event.description}</p>
+        )}
+
+        {/* Essential Info (Always visible or primary line) */}
+        {event.location && !isExpanded && (
+           <p className="text-xs text-slate-400 flex items-center mt-1">
+             <MapPin className="w-3 h-3 mr-1" /> {event.location}
+           </p>
+        )}
+
+        {/* Expanded Content */}
+        {isExpanded && (
+          <div className="mt-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+            
+            {/* Rich Actions */}
+            <div className="flex gap-2 flex-wrap">
+              {event.location && (
+                <a 
+                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((event.japaneseAddress || event.location))}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center transition-colors"
+                >
+                  <MapPin className="w-3 h-3 mr-1" /> Google Map
+                </a>
+              )}
+              {event.japaneseAddress && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowTaxi(true);
+                  }}
+                  className="flex-1 bg-slate-800 hover:bg-slate-900 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center justify-center transition-colors"
+                >
+                  🚕 Taxi Card
+                </button>
+              )}
+            </div>
+
+            {/* Transport Details */}
+            {event.transportDetail && (
+              <div className="bg-slate-50 p-3 rounded-lg text-sm text-slate-700 border border-slate-100">
+                <h4 className="font-bold text-slate-900 text-xs mb-1 flex items-center uppercase tracking-wide">
+                  <Bus className="w-3 h-3 mr-1" /> Transport Guide
+                </h4>
+                <p className="whitespace-pre-line">{event.transportDetail}</p>
+              </div>
+            )}
+
+            {/* Tips Section */}
+            {event.tips && event.tips.length > 0 && (
+              <div className="bg-amber-50 p-3 rounded-lg text-sm text-amber-900 border border-amber-100">
+                <h4 className="font-bold text-amber-800 text-xs mb-2 flex items-center uppercase tracking-wide">
+                  <Lightbulb className="w-3 h-3 mr-1" /> Pro Tips
+                </h4>
+                <ul className="list-disc list-inside space-y-1 ml-1">
+                  {event.tips.map((tip, idx) => (
+                    <li key={idx} className="text-amber-800/90">{tip}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Basic Metadata */}
+            <div className="pt-2 border-t border-slate-100 text-xs text-slate-500 space-y-1.5">
+              {event.cost && (
+                <div className="flex items-center">
+                  <span className="font-medium mr-2 text-slate-400">Cost:</span> {event.cost}
+                </div>
+              )}
+               {event.transportInfo && (
+                  <div className="flex items-center">
+                     <span className="font-medium mr-2 text-slate-400">Info:</span> {event.transportInfo}
+                  </div>
+                )}
+               {event.notes && (
+                  <div className="flex items-start">
+                     <Info className="w-3 h-3 mr-2 mt-0.5 shrink-0" /> 
+                     <span>{event.notes}</span>
+                  </div>
+                )}
+            </div>
+
+          </div>
+        )}
+      </div>
+
+      {showTaxi && event.japaneseAddress && (
+        <TaxiModal 
+          address={event.japaneseAddress} 
+          name={event.japaneseName || event.title} 
+          onClose={() => setShowTaxi(false)} 
+        />
+      )}
+    </>
+  );
+};
+
 const ItineraryView: React.FC = () => {
   const [selectedDayId, setSelectedDayId] = useState<string>('d1');
 
-  // Auto-scroll to current day if trip is happening
+  // Auto-select today if within date range
   useEffect(() => {
-    // Logic to select day based on real date could go here
+    // Logic could go here
   }, []);
 
   const currentSchedule = ITINERARY_DATA.find(d => d.id === selectedDayId);
@@ -51,9 +186,20 @@ const ItineraryView: React.FC = () => {
       <div className="flex-1 overflow-y-auto p-4 pb-24">
         {currentSchedule && (
           <div className="space-y-6">
-            <h2 className="text-xl font-bold text-slate-800 px-2">{currentSchedule.title}</h2>
+            <div className="flex justify-between items-end px-1">
+              <h2 className="text-2xl font-bold text-slate-900">{currentSchedule.title}</h2>
+              {currentSchedule.weatherForecast && (
+                <div className="text-right">
+                  <div className="flex items-center justify-end text-blue-600 text-sm font-medium">
+                     <CloudSnow className="w-4 h-4 mr-1" />
+                     Forecast
+                  </div>
+                  <p className="text-xs text-slate-500">{currentSchedule.weatherForecast}</p>
+                </div>
+              )}
+            </div>
             
-            <div className="relative pl-4 space-y-8 before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent">
+            <div className="relative pl-4 space-y-8 before:absolute before:inset-0 before:ml-4 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-slate-200">
               {currentSchedule.events.map((event, idx) => (
                 <div key={idx} className="relative flex items-start group">
                   {/* Icon Marker */}
@@ -61,42 +207,9 @@ const ItineraryView: React.FC = () => {
                     {getIcon(event.type)}
                   </div>
                   
-                  {/* Content Card */}
-                  <div className="ml-8 bg-white p-4 rounded-xl shadow-sm border border-slate-100 w-full transition-shadow hover:shadow-md">
-                    <div className="flex justify-between items-start mb-1">
-                      <span className="text-sm font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
-                        {event.time}
-                      </span>
-                      {event.location && (
-                        <a 
-                          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs text-slate-400 hover:text-blue-500 flex items-center"
-                        >
-                          <MapPin className="w-3 h-3 mr-1" /> 地圖
-                        </a>
-                      )}
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-800 mb-1">{event.title}</h3>
-                    {event.description && (
-                      <p className="text-slate-600 text-sm leading-relaxed mb-2">{event.description}</p>
-                    )}
-                    {(event.notes || event.transportInfo) && (
-                      <div className="mt-2 pt-2 border-t border-slate-100 text-xs text-slate-500 space-y-1">
-                        {event.transportInfo && (
-                          <div className="flex items-center">
-                             <Bus className="w-3 h-3 mr-2 opacity-70" /> {event.transportInfo}
-                          </div>
-                        )}
-                        {event.notes && (
-                          <div className="flex items-start">
-                             <div className="w-3 h-3 mr-2 mt-0.5 opacity-70">ℹ️</div> 
-                             <span>{event.notes}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                  {/* Event Component */}
+                  <div className="ml-8 w-full">
+                    <EventCard event={event} />
                   </div>
                 </div>
               ))}
