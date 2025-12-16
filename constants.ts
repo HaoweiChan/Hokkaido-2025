@@ -4,6 +4,9 @@ export const TRIP_TITLE = "北海道冬季之旅";
 export const TRIP_DATES = "2025年12月17日 - 12月23日";
 export const MAP_LIST_URL = "https://maps.app.goo.gl/sFRuU2Aaad7poMHaA";
 
+const SAPPORO_COORDS = { lat: 43.0618, lng: 141.3545 };
+const FURANO_COORDS = { lat: 43.3421, lng: 142.3832 };
+
 // Data extracted manually from the provided itinerary image and translated to ZH-TW
 export const ITINERARY_DATA: DaySchedule[] = [
   {
@@ -11,6 +14,7 @@ export const ITINERARY_DATA: DaySchedule[] = [
     date: '12/17',
     weekday: '週三',
     title: '抵達 & 札幌',
+    locationCoords: SAPPORO_COORDS,
     weatherForecast: '小雪 (-2°C / -6°C)',
     events: [
       {
@@ -74,6 +78,7 @@ export const ITINERARY_DATA: DaySchedule[] = [
     date: '12/18',
     weekday: '週四',
     title: '市區觀光 & 神宮',
+    locationCoords: SAPPORO_COORDS,
     weatherForecast: '多雲時晴 (-4°C / -8°C)',
     events: [
       {
@@ -158,6 +163,7 @@ export const ITINERARY_DATA: DaySchedule[] = [
     date: '12/19',
     weekday: '週五',
     title: '移動至富良野',
+    locationCoords: FURANO_COORDS,
     weatherForecast: '大雪 (-7°C / -12°C)',
     events: [
       {
@@ -202,6 +208,7 @@ export const ITINERARY_DATA: DaySchedule[] = [
     date: '12/20',
     weekday: '週六',
     title: '滑雪日 1',
+    locationCoords: FURANO_COORDS,
     weatherForecast: '陰有雪 (-8°C / -14°C)',
     events: [
       {
@@ -220,6 +227,7 @@ export const ITINERARY_DATA: DaySchedule[] = [
     date: '12/21',
     weekday: '週日',
     title: '滑雪日 2',
+    locationCoords: FURANO_COORDS,
     weatherForecast: '晴時多雲 (-8°C / -15°C)',
     events: [
       {
@@ -237,6 +245,7 @@ export const ITINERARY_DATA: DaySchedule[] = [
     date: '12/22',
     weekday: '週一',
     title: '返回札幌',
+    locationCoords: SAPPORO_COORDS,
     weatherForecast: '小雪 (-3°C / -7°C)',
     events: [
       {
@@ -283,6 +292,7 @@ export const ITINERARY_DATA: DaySchedule[] = [
     date: '12/23',
     weekday: '週二',
     title: '賦歸',
+    locationCoords: SAPPORO_COORDS,
     weatherForecast: '晴朗 (-2°C / -6°C)',
     events: [
       {

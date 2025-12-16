@@ -33,7 +33,8 @@ export interface DaySchedule {
   date: string;
   weekday: string;
   title: string;
-  weatherForecast?: string; // e.g., "Snow, -2°C"
+  locationCoords?: { lat: number; lng: number }; // For live weather
+  weatherForecast?: string; // Fallback text
   events: ItineraryEvent[];
 }
 
