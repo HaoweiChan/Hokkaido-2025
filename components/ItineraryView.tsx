@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ITINERARY_DATA } from '../constants';
 import { LocationType, ItineraryEvent } from '../types';
-import { MapPin, Bus, Utensils, BedDouble, Camera, ShoppingBag, Dumbbell, ChevronDown, ChevronUp, Info, Lightbulb, X, CloudSnow } from 'lucide-react';
+import { getWeatherForDate, getWeatherIconLabel } from '../utils/weather';
+import { MapPin, Bus, Utensils, BedDouble, Camera, ShoppingBag, Dumbbell, ChevronDown, ChevronUp, Info, Lightbulb, X, CloudSnow, Thermometer } from 'lucide-react';
 
 const getIcon = (type: LocationType) => {
   switch (type) {
@@ -28,6 +29,77 @@ const TaxiModal: React.FC<{ address: string; name?: string; onClose: () => void 
     <p className="mt-8 text-white/60 text-sm">Tap anywhere to close</p>
   </div>
 );
+
+const WeatherModal: React.FC<{ date: string; locationCoords?: { lat: number; lng: number }; onClose: () => void }> = ({ date, locationCoords, onClose }) => {
+  const [weather, setWeather] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      if (!locationCoords) return;
+
+      try {
+        const result = await getWeatherForDate(locationCoords.lat, locationCoords.lng, date);
+        setWeather(result);
+      } catch (error) {
+        console.error('Weather fetch failed:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWeather();
+  }, [date, locationCoords]);
+
+  const weatherInfo = weather ? getWeatherIconLabel(weather.code) : null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/90 flex flex-col justify-center items-center p-6 text-center animate-in fade-in duration-200" onClick={onClose}>
+      <button onClick={onClose} className="absolute top-6 right-6 text-white/80 hover:text-white">
+        <X className="w-8 h-8" />
+      </button>
+
+      <p className="text-slate-400 mb-6 text-sm font-medium uppercase tracking-widest">Weather Forecast</p>
+
+      <div className="bg-white text-slate-900 p-8 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+        <h3 className="text-2xl font-bold mb-6">{date}</h3>
+
+        {loading ? (
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <p className="text-slate-500">Loading weather...</p>
+          </div>
+        ) : weather && weatherInfo ? (
+          <div className="text-center space-y-4">
+            <div className="text-6xl mb-4">{weatherInfo.icon}</div>
+            <div className="text-2xl font-bold text-slate-800">{weatherInfo.label}</div>
+            <div className="flex justify-center items-center space-x-4 text-xl">
+              <div className="flex items-center">
+                <Thermometer className="w-5 h-5 mr-1 text-red-500" />
+                <span className="font-semibold">{Math.round(weather.maxTemp)}°</span>
+              </div>
+              <span className="text-slate-400">/</span>
+              <div className="flex items-center">
+                <Thermometer className="w-5 h-5 mr-1 text-blue-500" />
+                <span className="font-semibold">{Math.round(weather.minTemp)}°</span>
+              </div>
+            </div>
+            <div className="text-sm text-slate-500 mt-4">
+              Real-time forecast for your location
+            </div>
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="text-slate-500">Unable to load weather data</p>
+            <p className="text-xs text-slate-400 mt-2">Check your internet connection</p>
+          </div>
+        )}
+      </div>
+
+      <p className="mt-8 text-white/60 text-sm">Tap anywhere to close</p>
+    </div>
+  );
+};
 
 const EventCard: React.FC<{ event: ItineraryEvent }> = ({ event }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -152,6 +224,7 @@ const EventCard: React.FC<{ event: ItineraryEvent }> = ({ event }) => {
 
 const ItineraryView: React.FC = () => {
   const [selectedDayId, setSelectedDayId] = useState<string>('d1');
+  const [showWeatherModal, setShowWeatherModal] = useState(false);
 
   // Auto-select today if within date range
   useEffect(() => {
@@ -189,7 +262,10 @@ const ItineraryView: React.FC = () => {
             <div className="flex justify-between items-end px-1">
               <h2 className="text-2xl font-bold text-slate-900">{currentSchedule.title}</h2>
               {currentSchedule.weatherForecast && (
-                <div className="text-right">
+                <div
+                  className="text-right cursor-pointer hover:bg-blue-50 p-2 rounded-lg transition-colors"
+                  onClick={() => setShowWeatherModal(true)}
+                >
                   <div className="flex items-center justify-end text-blue-600 text-sm font-medium">
                      <CloudSnow className="w-4 h-4 mr-1" />
                      Forecast
@@ -217,6 +293,14 @@ const ItineraryView: React.FC = () => {
           </div>
         )}
       </div>
+
+      {showWeatherModal && currentSchedule && (
+        <WeatherModal
+          date={currentSchedule.date}
+          locationCoords={currentSchedule.locationCoords}
+          onClose={() => setShowWeatherModal(false)}
+        />
+      )}
     </div>
   );
 };
