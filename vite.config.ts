@@ -17,9 +17,9 @@ export default defineConfig(({ mode }) => {
           registerType: 'autoUpdate',
           includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
           manifest: {
-            name: 'Hokkaido 2024',
-            short_name: 'Hokkaido 2024',
-            description: 'A travel app for the Hokkaido 2024 trip.',
+            name: 'Hokkaido 2025',
+            short_name: 'Hokkaido 2025',
+            description: 'A travel app for the Hokkaido 2025 trip.',
             theme_color: '#ffffff',
             icons: [
               {

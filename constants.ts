@@ -1,7 +1,7 @@
 import { DaySchedule, LocationType, SavedPlace } from './types';
 
 export const TRIP_TITLE = "北海道冬季之旅";
-export const TRIP_DATES = "2024年12月17日 - 12月23日";
+export const TRIP_DATES = "2025年12月17日 - 12月23日";
 export const MAP_LIST_URL = "https://maps.app.goo.gl/sFRuU2Aaad7poMHaA";
 
 // Data extracted manually from the provided itinerary image and translated to ZH-TW

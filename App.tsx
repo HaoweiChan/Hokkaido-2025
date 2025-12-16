@@ -27,7 +27,7 @@ const App: React.FC = () => {
       <div className="md:hidden bg-blue-600 text-white p-4 pt-6 shadow-md flex justify-between items-center z-20 shrink-0">
         <div>
             <h1 className="font-bold text-xl flex items-center gap-2">
-                <Snowflake className="w-5 h-5" /> 北海道 2024
+                <Snowflake className="w-5 h-5" /> 北海道 2025
             </h1>
             <p className="text-xs text-blue-100 opacity-90">{TRIP_DATES}</p>
         </div>
