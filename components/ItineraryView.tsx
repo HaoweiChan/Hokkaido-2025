@@ -59,7 +59,7 @@ const WeatherModal: React.FC<{ date: string; locationCoords?: { lat: number; lng
         <X className="w-8 h-8" />
       </button>
 
-      <p className="text-slate-400 mb-6 text-sm font-medium uppercase tracking-widest">Weather Forecast</p>
+      <p className="text-slate-400 mb-6 text-sm font-medium uppercase tracking-widest">天氣預報</p>
 
       <div className="bg-white text-slate-900 p-8 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
         <h3 className="text-2xl font-bold mb-6">{date}</h3>
@@ -67,7 +67,7 @@ const WeatherModal: React.FC<{ date: string; locationCoords?: { lat: number; lng
         {loading ? (
           <div className="flex flex-col items-center space-y-4">
             <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            <p className="text-slate-500">Loading weather...</p>
+            <p className="text-slate-500">載入天氣中...</p>
           </div>
         ) : weather && weatherInfo ? (
           <div className="text-center space-y-4">
@@ -85,18 +85,18 @@ const WeatherModal: React.FC<{ date: string; locationCoords?: { lat: number; lng
               </div>
             </div>
             <div className="text-sm text-slate-500 mt-4">
-              Real-time forecast for your location
+              您所在位置的即時天氣預報
             </div>
           </div>
         ) : (
           <div className="text-center">
-            <p className="text-slate-500">Unable to load weather data</p>
-            <p className="text-xs text-slate-400 mt-2">Check your internet connection</p>
+            <p className="text-slate-500">無法載入天氣資料</p>
+            <p className="text-xs text-slate-400 mt-2">請檢查網路連線</p>
           </div>
         )}
       </div>
 
-      <p className="mt-8 text-white/60 text-sm">Tap anywhere to close</p>
+      <p className="mt-8 text-white/60 text-sm">點擊任意處關閉</p>
     </div>
   );
 };
@@ -268,7 +268,7 @@ const ItineraryView: React.FC = () => {
                 >
                   <div className="flex items-center justify-end text-blue-600 text-sm font-medium">
                      <CloudSnow className="w-4 h-4 mr-1" />
-                     Forecast
+                     預報
                   </div>
                   <p className="text-xs text-slate-500">{currentSchedule.weatherForecast}</p>
                 </div>

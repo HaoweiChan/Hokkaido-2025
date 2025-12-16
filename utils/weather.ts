@@ -46,12 +46,12 @@ export const getWeatherIconLabel = (code: number): { label: string, icon: string
   // 85, 86: Snow showers
   // 95: Thunderstorm
 
-  if (code === 0) return { label: 'Sunny', icon: '☀️' };
-  if (code <= 3) return { label: 'Cloudy', icon: '☁️' };
-  if (code <= 48) return { label: 'Fog', icon: '🌫️' };
-  if (code <= 67) return { label: 'Rain', icon: 'Vm' };
-  if (code <= 77) return { label: 'Snow', icon: '❄️' };
-  if (code <= 86) return { label: 'Snow Showers', icon: '🌨️' };
-  return { label: 'Storm', icon: '⚡' };
+  if (code === 0) return { label: '晴天', icon: '☀️' };
+  if (code <= 3) return { label: '多雲', icon: '☁️' };
+  if (code <= 48) return { label: '霧', icon: '🌫️' };
+  if (code <= 67) return { label: '雨', icon: '🌧️' };
+  if (code <= 77) return { label: '雪', icon: '❄️' };
+  if (code <= 86) return { label: '陣雪', icon: '🌨️' };
+  return { label: '雷暴', icon: '⚡' };
 };
 
