@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ItineraryView from './components/ItineraryView.tsx';
 import PlacesView from './components/PlacesView.tsx';
 import { Calendar, Map, Snowflake } from 'lucide-react';
-import { TRIP_DATES } from './constants';
+import { TRIP_DATES, TRIP_TITLE } from './constants';
 
 enum Tab {
   ITINERARY = 'itinerary',
@@ -27,7 +27,7 @@ const App: React.FC = () => {
       <div className="md:hidden bg-blue-600 text-white p-4 pt-6 shadow-md flex justify-between items-center z-20 shrink-0">
         <div>
             <h1 className="font-bold text-xl flex items-center gap-2">
-                <Snowflake className="w-5 h-5" /> 北海道 2025
+                <Snowflake className="w-5 h-5" /> {TRIP_TITLE}
             </h1>
             <p className="text-xs text-blue-100 opacity-90">{TRIP_DATES}</p>
         </div>
@@ -37,7 +37,7 @@ const App: React.FC = () => {
       <div className="hidden md:flex w-full bg-slate-900 text-white p-4 border-b border-slate-800 items-center justify-between shrink-0">
         <div className="flex items-center gap-6">
             <h1 className="font-bold text-xl flex items-center gap-2">
-                <Snowflake className="text-blue-400 w-6 h-6" /> 北海道
+                <Snowflake className="text-blue-400 w-6 h-6" /> {TRIP_TITLE}
             </h1>
             <p className="text-slate-400 text-sm border-l border-slate-700 pl-4 py-1">{TRIP_DATES}</p>
         </div>
