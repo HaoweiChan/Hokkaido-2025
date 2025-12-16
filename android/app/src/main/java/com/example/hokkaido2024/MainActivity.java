@@ -1,4 +1,4 @@
-package com.example.hokkaido2024;
+package com.example.hokkaido2025;
 
 import com.getcapacitor.BridgeActivity;
 
