@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import ItineraryView from './components/ItineraryView';
-import PlacesView from './components/PlacesView';
+import ItineraryView from './components/ItineraryView.tsx';
+import PlacesView from './components/PlacesView.tsx';
 import { Calendar, Map, Snowflake } from 'lucide-react';
 import { TRIP_DATES } from './constants';
 
