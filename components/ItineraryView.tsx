@@ -30,27 +30,7 @@ const TaxiModal: React.FC<{ address: string; name?: string; onClose: () => void 
   </div>
 );
 
-const WeatherModal: React.FC<{ date: string; locationCoords?: { lat: number; lng: number }; onClose: () => void }> = ({ date, locationCoords, onClose }) => {
-  const [weather, setWeather] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchWeather = async () => {
-      if (!locationCoords) return;
-
-      try {
-        const result = await getWeatherForDate(locationCoords.lat, locationCoords.lng, date);
-        setWeather(result);
-      } catch (error) {
-        console.error('Weather fetch failed:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchWeather();
-  }, [date, locationCoords]);
-
+const WeatherModal: React.FC<{ weather: any; date: string; onClose: () => void }> = ({ weather, date, onClose }) => {
   const weatherInfo = weather ? getWeatherIconLabel(weather.code) : null;
 
   return (
@@ -64,12 +44,7 @@ const WeatherModal: React.FC<{ date: string; locationCoords?: { lat: number; lng
       <div className="bg-white text-slate-900 p-8 rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
         <h3 className="text-2xl font-bold mb-6">{date}</h3>
 
-        {loading ? (
-          <div className="flex flex-col items-center space-y-4">
-            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-            <p className="text-slate-500">載入天氣中...</p>
-          </div>
-        ) : weather && weatherInfo ? (
+        {weather && weatherInfo ? (
           <div className="text-center space-y-4">
             <div className="text-6xl mb-4">{weatherInfo.icon}</div>
             <div className="text-2xl font-bold text-slate-800">{weatherInfo.label}</div>
@@ -225,13 +200,47 @@ const EventCard: React.FC<{ event: ItineraryEvent }> = ({ event }) => {
 const ItineraryView: React.FC = () => {
   const [selectedDayId, setSelectedDayId] = useState<string>('d1');
   const [showWeatherModal, setShowWeatherModal] = useState(false);
+  const [weatherData, setWeatherData] = useState<Record<string, any>>({});
 
-  // Auto-select today if within date range
+  // Fetch weather data for all days on component mount
   useEffect(() => {
-    // Logic could go here
+    const fetchAllWeather = async () => {
+      const weatherPromises = ITINERARY_DATA.map(async (day) => {
+        if (day.locationCoords) {
+          try {
+            const result = await getWeatherForDate(day.locationCoords.lat, day.locationCoords.lng, day.date);
+            return { dayId: day.id, weather: result };
+          } catch (error) {
+            console.error(`Weather fetch failed for ${day.date}:`, error);
+            return { dayId: day.id, weather: null };
+          }
+        }
+        return { dayId: day.id, weather: null };
+      });
+
+      const results = await Promise.all(weatherPromises);
+      const weatherMap: Record<string, any> = {};
+      results.forEach(({ dayId, weather }) => {
+        weatherMap[dayId] = weather;
+      });
+      setWeatherData(weatherMap);
+    };
+
+    fetchAllWeather();
   }, []);
 
   const currentSchedule = ITINERARY_DATA.find(d => d.id === selectedDayId);
+  const currentWeather = weatherData[selectedDayId];
+
+  // Format weather display for dashboard
+  const getWeatherDisplay = (schedule: any, weather: any) => {
+    if (weather && weather.code !== undefined) {
+      const weatherInfo = getWeatherIconLabel(weather.code);
+      return `${weatherInfo.label} (${Math.round(weather.maxTemp)}° / ${Math.round(weather.minTemp)}°)`;
+    }
+    // Fallback to static text if API fails
+    return schedule.weatherForecast || '天氣資料載入中...';
+  };
 
   return (
     <div className="flex flex-col h-full bg-slate-50">
@@ -261,7 +270,7 @@ const ItineraryView: React.FC = () => {
           <div className="space-y-6">
             <div className="flex justify-between items-end px-1">
               <h2 className="text-2xl font-bold text-slate-900">{currentSchedule.title}</h2>
-              {currentSchedule.weatherForecast && (
+              {(currentSchedule.weatherForecast || currentWeather) && (
                 <div
                   className="text-right cursor-pointer hover:bg-blue-50 p-2 rounded-lg transition-colors"
                   onClick={() => setShowWeatherModal(true)}
@@ -270,7 +279,7 @@ const ItineraryView: React.FC = () => {
                      <CloudSnow className="w-4 h-4 mr-1" />
                      預報
                   </div>
-                  <p className="text-xs text-slate-500">{currentSchedule.weatherForecast}</p>
+                  <p className="text-xs text-slate-500">{getWeatherDisplay(currentSchedule, currentWeather)}</p>
                 </div>
               )}
             </div>
@@ -296,8 +305,8 @@ const ItineraryView: React.FC = () => {
 
       {showWeatherModal && currentSchedule && (
         <WeatherModal
+          weather={currentWeather}
           date={currentSchedule.date}
-          locationCoords={currentSchedule.locationCoords}
           onClose={() => setShowWeatherModal(false)}
         />
       )}
